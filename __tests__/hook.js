@@ -15,18 +15,14 @@ jest.mock('react', () => ({
 }))
 
 describe('useBackgroundImageSize', () => {
-  beforeAll(() => {
-    jest.useFakeTimers()
-  })
-  afterAll(() => {
-    jest.useRealTimers()
-  })
+  const width = 200
+  const height = 100
 
   global.Image = class extends Image {
     constructor() {
       super()
-      this.width = 200
-      this.height = 200
+      this.width = width
+      this.height = height
 
       setTimeout(() => {
         this.onload()
@@ -35,54 +31,49 @@ describe('useBackgroundImageSize', () => {
   }
 
   it('gets the width and height of CSS background images', async () => {
-    const { result, waitForNextUpdate } = renderHook(() => useBackgroundImageSize())
+    const { result, waitFor, rerender } = renderHook(
+      ({ initialValue }) => useBackgroundImageSize(initialValue),
+      {
+        initialProps: { initialValue: undefined }
+      }
+    )
 
+    // Should return the ref and null while the images are loading
     expect(result.current).toStrictEqual([{ current: mockElement }, null])
-    act(() => {
-      jest.advanceTimersByTime(1000)
-    })
 
-    await waitForNextUpdate()
+    // After the images load should return the width, height, and image src
+    await waitFor(() => expect(result.current[1]).toStrictEqual({ width, height, src }))
 
-    //await waitForNextUpdate()
-    expect(result.current).toStrictEqual([
-      { current: mockElement },
-      { width: 200, height: 200, src }
-    ])
-  })
+    // Pass an image URL
+    rerender({ initialValue: './foo/bar.png' })
 
-  it('can be passed a url to use as the image src', async () => {
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useBackgroundImageSize('./foo/bar')
+    await waitFor(() =>
+      expect(result.current[1]).toStrictEqual({
+        width,
+        height,
+        src: './foo/bar.png'
+      })
     )
 
-    act(() => {
-      jest.advanceTimersByTime(1000)
-    })
-    await waitForNextUpdate()
+    // Pass multiple image URLs
+    rerender({ initialValue: ['./foo/bar.png', './one/two.svg'] })
 
-    expect(result.current).toStrictEqual([
-      { current: mockElement },
-      { width: 200, height: 200, src: './foo/bar' }
-    ])
-  })
-
-  it('can be passed an array of urls', async () => {
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useBackgroundImageSize(['./foo/bar', './one/two'])
+    await waitFor(() =>
+      expect(result.current[1]).toStrictEqual([
+        { width, height, src: './foo/bar.png' },
+        { width, height, src: './one/two.svg' }
+      ])
     )
 
-    act(() => {
-      jest.advanceTimersByTime(1000)
-    })
-    await waitForNextUpdate()
+    // Pass true to get a reference to the callback
+    rerender({ initialValue: true })
 
-    expect(result.current).toStrictEqual([
-      { current: mockElement },
-      [
-        { width: 200, height: 200, src: './foo/bar' },
-        { width: 200, height: 200, src: './one/two' }
-      ]
-    ])
+    expect(result.current[2]).toStrictEqual(expect.any(Function))
+
+    act(() => {
+      result.current[2]()
+    })
+
+    await waitFor(() => expect(result.current[1]).toStrictEqual({ width, height, src }))
   })
 })

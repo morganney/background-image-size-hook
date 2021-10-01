@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 
-const urlRgx = /url\((['"`])?(.+?)\1\)/
+const urlRgx = /url\((['"])?(.+?)\1\)/
 const getImagePromise = src =>
   new Promise(resolve => {
     const img = new Image()
@@ -30,7 +30,7 @@ const useBackgroundImageSize = (asCallbackFlagOrUrls = false) => {
       const imgPromises = asCallbackFlagOrUrls.map(getImagePromise)
       const imgs = await Promise.all(imgPromises)
 
-      if (ref.current) {
+      if (ref?.current) {
         setImages(imgs)
       }
     }
@@ -38,7 +38,7 @@ const useBackgroundImageSize = (asCallbackFlagOrUrls = false) => {
     if (typeof asCallbackFlagOrUrls === 'string') {
       const image = await getImagePromise(asCallbackFlagOrUrls)
 
-      if (ref.current) {
+      if (ref?.current) {
         setImages(image)
       }
     }
@@ -55,7 +55,7 @@ const useBackgroundImageSize = (asCallbackFlagOrUrls = false) => {
           )
           const imgs = await Promise.all(imgPromises)
 
-          if (ref.current) {
+          if (ref?.current) {
             setImages(imgs.length > 1 ? imgs : imgs[0])
           }
         }

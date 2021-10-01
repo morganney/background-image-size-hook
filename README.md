@@ -1,12 +1,15 @@
 # [`background-image-size-hook`](https://www.npmjs.com/package/background-image-size-hook)
 
+![CI](https://github.com/morganney/background-image-size-hook/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/morganney/background-image-size-hook/branch/master/graph/badge.svg?token=DYGZWNW556)](https://codecov.io/gh/morganney/background-image-size-hook)
+
 React hook to get the size of CSS background images.
 
 ## Usage
 
 First `npm i background-image-size-hook react react-dom`.
 
-Then when you want to change the dimensions of an element based on the size of its loaded background image (`data:` urls are ok):
+Then when you want to change the dimensions of an element based on the size of its loaded background image:
 
 ```js
 import { useBackgroundImageSize } from 'background-image-size-hook'
@@ -55,14 +58,14 @@ Beyond the simple use case of one static background image, more complex use case
 
 ### Multiple Background Images
 
-If the element has multiple background images then an array of objects will be returned instead of an object. Images not references by a `url` will be ignored:
+If the element has multiple background images then an array of objects will be returned instead of an object. Background images not referenced by a `url` will be ignored:
 
 ```js
 const Box = styled.div`
   background-image:
     linear-gradient(rgba(0, 0, 255, 0.5), rgba(255, 255, 0, 0.5)),
     url('https://other-domain.com/images/cool.png'),
-    url('https://other-domain/images/rad.svg');
+    url('data:image/png;base64,iRxVB0…');
 `
 const App = () => {
   const [ref, images] = useBackgroundImageSize()
@@ -97,7 +100,7 @@ const App = () => {
 
         setLogo(logoImport.default)
       } catch {
-        setLogo('mickey-mouse.svg')
+        setLogo('defaultLogo.svg')
       }
     }
 
@@ -106,7 +109,7 @@ const App = () => {
 
   return (
     <>
-      <Box ref={ref} />
+      <Box ref={ref} image={image} />
       {!image && <Skeleton width="200px" height="100px" />}
     </>
   )
@@ -122,7 +125,7 @@ If you want to pass urls from multiple dynamic background images, then use an ar
 
 ### Multiple Dependencies
 
-If you want to control when the background image size is computed based on other dependencies you can get a reference to the hooks callback by passing `true`. In this case the hook will include a callback to run when one of your dependencies changes.
+If you want to control when the background image size is computed based on other dependencies you can get a reference to the hook's callback by passing `true`. In this case the hook will return a callback function that can be called when one of the dependencies changes to get the background image size.
 
 ```js
 const App = () => {
@@ -132,7 +135,7 @@ const App = () => {
     getImageSizes()
   }, [getImageSizes, dep1, dep2, etc])
 
-  return <Box ref={ref} />
+  return <Box ref={ref} images={images} />
 }
 ```
 
