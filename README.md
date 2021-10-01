@@ -1,5 +1,8 @@
 # [`background-image-size-hook`](https://www.npmjs.com/package/background-image-size-hook)
 
+![CI](https://github.com/morganney/background-image-size-hook/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/morganney/background-image-size-hook/branch/master/graph/badge.svg?token=DYGZWNW556)](https://codecov.io/gh/morganney/background-image-size-hook)
+
 React hook to get the size of CSS background images.
 
 ## Usage
