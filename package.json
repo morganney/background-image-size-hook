@@ -1,6 +1,6 @@
 {
   "name": "background-image-size-hook",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React hook to get the size of a CSS background-image",
   "main": "dist",
   "repository": {
